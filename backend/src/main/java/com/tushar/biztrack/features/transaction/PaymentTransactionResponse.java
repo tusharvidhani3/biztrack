@@ -13,7 +13,7 @@ public class PaymentTransactionResponse {
     
     private Long id;
     private PartyDto party;
-    // private PaymentDirection direction;
+    private PaymentDirection direction;
     private Long amount;
     private LocalDate paymentDate;
 }

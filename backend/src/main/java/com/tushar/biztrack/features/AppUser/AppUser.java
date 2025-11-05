@@ -1,9 +1,12 @@
 package com.tushar.biztrack.features.AppUser;
 
+import java.util.Set;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,5 +24,8 @@ public class AppUser {
     private String email;
 
     private String password;
+
+    @ManyToMany
+    private Set<Role> roles;
 
 }

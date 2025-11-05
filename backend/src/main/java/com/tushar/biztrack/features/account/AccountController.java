@@ -26,8 +26,9 @@ public class AccountController {
     private AccountService accountService;
     
     @GetMapping
-    public ResponseEntity<PagedModel<EntityModel<AccountSummary>>> searchAccounts(@RequestParam("party-name") String partyName, @RequestParam("party-type") PartyType type, PagedResourcesAssembler<AccountSummary> assembler) {
-        Page<AccountSummary> accounts = accountService.getAccounts(partyName, type);
+    public ResponseEntity<PagedModel<EntityModel<AccountSummary>>> searchAccounts(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "100") int size, @RequestParam("party-name") String partyName, @RequestParam("party-type") PartyType type, PagedResourcesAssembler<AccountSummary> assembler) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<AccountSummary> accounts = accountService.getAccounts(pageable, partyName, type);
         return ResponseEntity.ok(assembler.toModel(accounts));
     }
 

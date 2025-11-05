@@ -12,9 +12,8 @@ import lombok.NoArgsConstructor;
 public class AccountResponse {
     private Long id;
     private PartyDto party;
-    private List<AccountEntryResponse> billEntries;
-    private List<AccountEntryResponse> paymentEntries;
-    private Long nextClosingAmount;
+    private List<AccountEntryResponse> entries;
+    private Long nextClosingDue;
     private Long nextClosingBillEntryId;
     private long totalDue;
 }

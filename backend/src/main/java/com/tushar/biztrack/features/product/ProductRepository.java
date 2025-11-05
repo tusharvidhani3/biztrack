@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProductRepository extends JpaRepository<Product,Long> {
     
-    @Query("SELECT p FROM Product p WHERE LOWER(p.productName) LIKE LOWER(CONCAT('%', :keyword, '%')) AND (:includeInactive = TRUE OR p.isActive = TRUE)")
-    Page<Product> findByProductName(@Param("productName") String productName, @Param("includeInactive") boolean includeInactive, Pageable pageable);
+    @Query("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) AND (:includeInactive = true OR p.active = true)")
+    Page<Product> findByProductName(@Param("keyword") String productName, @Param("includeInactive") boolean includeInactive, Pageable pageable);
 }

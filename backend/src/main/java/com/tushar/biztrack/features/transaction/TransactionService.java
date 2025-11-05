@@ -4,14 +4,17 @@ import java.time.LocalDate;
 
 public interface TransactionService {
     
-    Long calculateQuantityLost(Long purchaseEntryId);
+    // Long calculateQuantityLost(Long purchaseEntryId);
     DailyTransactions getTransactionsByDate(LocalDate date);
     PaymentTransactionResponse createPaymentTransaction(PaymentTransactionRequest paymentTransactionRequest);
     void deletePaymentTransaction(Long paymentTransactionId);
     PaymentTransactionResponse updatePaymentTransaction(PaymentTransactionRequest paymentTransactionRequest);
     GoodsTransactionResponse createSaleTransaction(GoodsTransactionRequest goodsTransactionRequest);
-    void deleteGoodsTransaction(Long goodsTransactionId);
-    GoodsTransactionResponse updateGoodsTransaction(GoodsTransactionRequest goodsTransactionRequest);
+    GoodsTransactionResponse createPurchaseTransaction(GoodsTransactionRequest goodsTransactionRequest);
+    void deleteSaleTransaction(Long saleTransactionId);
+    void deletePurchaseTransaction(Long purchaseTransactionId);
+    GoodsTransactionResponse updateSaleTransaction(GoodsTransactionRequest goodsTransactionRequest);
+    GoodsTransactionResponse updatePurchaseTransaction(GoodsTransactionRequest goodsTransactionRequest);
     long getSaleTransactionAmount(Long saleTransactionId);
     long calculateProfit(Long saleTransactionId);
 }

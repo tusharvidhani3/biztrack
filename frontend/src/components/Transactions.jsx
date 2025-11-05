@@ -5,6 +5,7 @@ import GoodsTransactionCard from "./GoodsTransactionCard";
 import prevIcon from '../assets/icons/prev.svg'
 import nextIcon from '../assets/icons/next.svg'
 import PaymentTransactionCard from "./PaymentTransactionCard";
+import loadingGif from '../assets/images/loading.gif'
 
 export default function Transactions() {
 
@@ -28,34 +29,46 @@ export default function Transactions() {
 
     return dayTransactions ? (
         <>
-        <div className="flex gap-3 justify-center items-center">
-            <button className="flex items-center justify-center cursor-pointer w-5" onClick={() => setSelectedDate(selectedDate => {
-                const prevDate = new Date(selectedDate)
-                prevDate.setDate(prevDate.getDate() - 1)
-                return prevDate.toISOString().split("T")[0]
+            <div className="flex gap-3 justify-center items-center">
+                <button className="flex items-center justify-center cursor-pointer w-5" onClick={() => setSelectedDate(selectedDate => {
+                    const prevDate = new Date(selectedDate)
+                    prevDate.setDate(prevDate.getDate() - 1)
+                    return prevDate.toISOString().split("T")[0]
                 })}><img src={prevIcon} alt="previous day" /></button>
-            <input type="date" id="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} />
-            <button className="flex items-center justify-center cursor-pointer w-5" onClick={() => setSelectedDate(selectedDate => {
-                const prevDate = new Date(selectedDate)
-                prevDate.setDate(prevDate.getDate() + 1)
-                return prevDate.toISOString().split("T")[0]
+                <input type="date" id="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} />
+                <button className="flex items-center justify-center cursor-pointer w-5" onClick={() => setSelectedDate(selectedDate => {
+                    const prevDate = new Date(selectedDate)
+                    prevDate.setDate(prevDate.getDate() + 1)
+                    return prevDate.toISOString().split("T")[0]
                 })}><img src={nextIcon} alt="next day" /></button>
-        </div>
-        <nav className="flex w-full bg-amber-300">
-            <button className={`basis-1/2 rounded m-1 cursor-pointer ${isTabIncoming ? 'bg-white cursor-default' : ''}`} onClick={() => setTabIncoming(true)}>Incoming</button>
-            <button className={`basis-1/2 rounded m-1 cursor-pointer ${isTabIncoming ? '' : 'bg-white cursor-default'}`} onClick={() => setTabIncoming(false)}>Outgoing</button>
-        </nav>
-        {isTabIncoming ? 
-        <section>
-            {/* {dayTransactions.saleTransations.map(saleTransaction => <GoodsTransactionCard transaction={saleTransaction} />)} */}
-            {/* {dayTransactions.sentPaymentTransactions.map(paymentTransaction => <PaymentTransactionCard transaction={paymentTransaction} />)} */}
-        </section>
-        :
-        <section>
-            {/* {dayTransactions.saleTransations.map(saleTransaction => <GoodsTransactionCard transaction={saleTransaction} />)} */}
-            {/* {dayTransactions.sentPaymentTransactions.map(paymentTransaction => <PaymentTransactionCard transaction={paymentTransaction} />)} */}
-        </section>
-        }
+            </div>
+            <nav className="flex w-full bg-amber-300">
+                <button className={`basis-1/2 rounded m-1 cursor-pointer ${isTabIncoming ? 'bg-white cursor-default' : ''}`} onClick={() => setTabIncoming(true)}>Incoming</button>
+                <button className={`basis-1/2 rounded m-1 cursor-pointer ${isTabIncoming ? '' : 'bg-white cursor-default'}`} onClick={() => setTabIncoming(false)}>Outgoing</button>
+            </nav>
+            {isTabIncoming ?
+                <section>
+                    <section>
+                        <h3>Sales</h3>
+                        {dayTransactions.saleTransations.map(saleTransaction => <GoodsTransactionCard transaction={saleTransaction} />)}
+                    </section>
+                    <section>
+                        <h3>Sent Payments</h3>
+                        {dayTransactions.sentPaymentTransactions.map(paymentTransaction => <PaymentTransactionCard transaction={paymentTransaction} />)}
+                    </section>
+                </section>
+                :
+                <section>
+                    <section>
+                        <h3>Purchases</h3>
+                        {dayTransactions.purchaseTransactions.map(saleTransaction => <GoodsTransactionCard transaction={saleTransaction} />)}
+                    </section>
+                    <section>
+                        <h3>Received Payments</h3>
+                        {dayTransactions.receivedPaymentTransactions.map(paymentTransaction => <PaymentTransactionCard transaction={paymentTransaction} />)}
+                    </section>
+                </section>
+            }
         </>
-    ) : 'loading...'
+    ) : <img className='loadingGif' src={loadingGif} alt="Loading..." />
 }

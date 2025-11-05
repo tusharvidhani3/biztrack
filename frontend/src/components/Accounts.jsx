@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useReducer, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react"
 import Searchbox from "./Searchbox"
 import { useAuthFetch } from "../hooks/useAuthFetch"
 import { apiBaseUrl } from "../config"
@@ -42,8 +42,23 @@ export default function Accounts() {
         const res = await authFetch(`${apiBaseUrl}/api/accounts`, {
             method: 'GET'
         })
+        const filters = []
+        if(keyword)
+            filters.push(`keyword=${keyword}`)
+        if(partyType)
+            filters.push(`partyType=${partyType}`)
+        if(places.length) {
+            places.forEach(place => {
+                filters.push(`places=${place}`)
+            })
+        }
         const accountsList = await res.json()
         setAccounts(accountsList)
+    }, [])
+    
+    useEffect(() => {
+        const init = async () => await searchAccounts()
+        init()
     }, [])
 
     return (
@@ -59,13 +74,19 @@ export default function Accounts() {
                     <div>Total Amount to pay to all suppliers</div>
                 </div>
             </section>
-            <Searchbox keyword={keyword} setKeyword={setKeyword} />
-            <button className="fixed rounded"></button>
-            <div className="flex rounded-3xl box-border w-9/10 bg-bg-surface px-4 py-1.5 gap-2 fixed bottom-2 h-10 max-w-full">
-                <input className="" type="number" id="amount" step="0.1" inputMode="decimal" min="0" placeholder="Enter payment amount" value={paymentEntry.amount} onChange={e => dispatch({ type: 'AMOUNT', payload: e.target.value })} />
-                <label htmlFor="date" onClick={() => dateInputRef.current.showPicker()}>{dateLabel}</label>
-                <input ref={dateInputRef} className="hidden" type="date" id="date" value={paymentEntry.date} onChange={e => dispatch({ type: 'DATE', payload: e.target.value })} />
-            </div>
+            <Searchbox keyword={keyword} setKeyword={setKeyword} placeholder={"Search by party"} />
+            <section>
+                {
+                    accounts.map(account => {
+                        <div className="flex flex-col rounded-xl border">
+                            <div className="font-bold">{account.party.name} {account.party.city}</div>
+                            <div>Outstanding balance: <span className="font-bold">{account.totalDue}</span></div>
+                            <div>L. Pay Date: <span></span></div>
+                            <div>Party Type: <span className="font-bold">{account.party.type}</span></div>
+                        </div>
+                    })
+                }
+            </section>            
         </>
     )
 }

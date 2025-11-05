@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PaymentTransactionRequest {
 
+    private Long id;
     private Long partyId;
     private Long amount;
     private PaymentDirection direction;

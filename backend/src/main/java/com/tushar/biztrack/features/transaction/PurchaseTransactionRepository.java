@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PurchaseTransactionRepository extends JpaRepository<PurchaseTransaction, Long> {
     
-    @Query("SELECT DISTINCT t FROM PurchaseTransaction t LEFT JOIN t.entries WHERE t.orderDate = :date OR t.receivedDate = :date OR (t.orderDate IS NULL OR (t.date > t.orderDate AND t.receivedDate < t.date))")
-    List<PurchaseTransaction> findByDateWithEntries(@Param("date") LocalDate date);
+    @Query("SELECT DISTINCT t FROM PurchaseTransaction t WHERE t.orderDate = :date OR t.receivedDate = :date OR (t.orderDate IS NULL OR (:date > t.orderDate AND t.receivedDate < :date))")
+    List<PurchaseTransaction> findByDate(@Param("date") LocalDate date);
+
 }

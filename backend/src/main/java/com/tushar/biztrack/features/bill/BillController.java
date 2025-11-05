@@ -45,7 +45,7 @@ public class BillController {
     }
 
     @GetMapping
-    public ResponseEntity<PagedModel<EntityModel<BillResponse>>> getBills(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "100") int size, @RequestParam("party-name") String partyName, @RequestParam("from") LocalDate startDate, @RequestParam("to") LocalDate endDate, PagedResourcesAssembler<BillResponse> assembler) {
+    public ResponseEntity<PagedModel<EntityModel<BillResponse>>> getBills(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam("party-name") String partyName, @RequestParam("from") LocalDate startDate, @RequestParam("to") LocalDate endDate, PagedResourcesAssembler<BillResponse> assembler) {
         Pageable pageable = PageRequest.of(page, size);
         Page<BillResponse> bills = billService.getBills(pageable, partyName);
         return ResponseEntity.ok(assembler.toModel(bills));

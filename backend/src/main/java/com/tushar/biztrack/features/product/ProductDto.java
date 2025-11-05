@@ -10,4 +10,6 @@ public class ProductDto {
     private Long id;
     private String name;
     private Boolean active;
+    private long lastSellPrice;
+    private long lastPurchasePrice;
 }

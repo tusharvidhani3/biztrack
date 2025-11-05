@@ -11,4 +11,5 @@ public class AccountEntryResponse {
     private Long id;
     private Long amount;
     private LocalDate date;
+    private AccountEntryType type;
 }

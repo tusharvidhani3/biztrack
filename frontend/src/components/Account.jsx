@@ -43,7 +43,15 @@ export default function Account() {
             </div>
 
             <section className="flex flex-col">
-                
+                {account.entries.map(entry => {
+                    const entryDate = new Date(entry.date)
+                    if(entry.type === 'BILL') {
+                        return <div className="flex"><div>{entryDate.getDate()} {entryDate.toLocaleString('default', { month: 'long' })} {entryDate.getFullYear()}</div> <div>₹{entry.amount}</div></div>
+                    }
+                    else {
+                        return
+                    }
+                })}
             </section>
 
             <button className="fixed flex items-center justify-center right-4 bottom-4 bg-[#F1F1F1] rounded-xl h-10 w-10 cursor-pointer" ><img className="h-3/5" src={plusIcon} alt="add account entry" /></button>

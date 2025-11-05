@@ -1,0 +1,164 @@
+package com.tushar.biztrack.features.auth;
+
+import java.time.Duration;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.tushar.biztrack.common.security.UserPrincipal;
+import com.tushar.biztrack.features.AppUser.AppUser;
+import com.tushar.biztrack.features.AppUser.AppUserDto;
+import com.tushar.biztrack.features.AppUser.AppUserMapper;
+import com.tushar.biztrack.features.AppUser.AppUserService;
+
+import jakarta.validation.Valid;
+
+@RestController
+@RequestMapping("/api/auth")
+public class AuthController {
+
+    @Autowired
+    private AppUserService userService;
+
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    private RefreshTokenService tokenService;
+
+    @Autowired
+    private AppUserMapper userMapper;
+
+    @PostMapping(value = {"/register", "/signup"})
+    public ResponseEntity<AppUserDto> register(@RequestBody @Valid AuthRequest authRequest) {
+        userService.register(authRequest);
+        UserPrincipal userPrincipal = userService.authenticate(authRequest);
+        AppUser user = userPrincipal.getUser();
+        AppUserDto userDto = userMapper.toDto(user);
+        String jwt = jwtService.generateToken(user.getId(), userDto.getRoles());
+        String refreshToken = tokenService.generateRefreshToken(userPrincipal.getUser());
+        ResponseCookie accessCookie = ResponseCookie.from("access_token", jwt)
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .maxAge(Duration.ofMinutes(60))
+            .sameSite("None")
+            .build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
+            .httpOnly(true)
+            .secure(true)
+            .path("/api/auth")
+            .maxAge(Duration.ofDays(30))
+            .sameSite("None")
+            .build();
+
+        return ResponseEntity.ok()
+            .headers(headers -> {
+                headers.add(HttpHeaders.SET_COOKIE, accessCookie.toString());
+                headers.add(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+            })
+            .body(userDto);
+    }
+
+    @PostMapping(value = {"/login", "/signin"})
+    public ResponseEntity<AppUserDto> login(@RequestBody @Valid AuthRequest authRequest) {
+        UserPrincipal userPrincipal = userService.authenticate(authRequest);
+        AppUser user = userPrincipal.getUser();
+        AppUserDto userDto = userMapper.toDto(user);
+        String jwt = jwtService.generateToken(user.getId(), userDto.getRoles());
+        String refreshToken = tokenService.generateRefreshToken(userPrincipal.getUser());
+        ResponseCookie accessCookie = ResponseCookie.from("access_token", jwt)
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .maxAge(Duration.ofMinutes(60))
+            .sameSite("None")
+            .build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
+            .httpOnly(true)
+            .secure(true)
+            .path("/api/auth")
+            .maxAge(Duration.ofDays(30))
+            .sameSite("None")
+            .build();
+
+        return ResponseEntity.ok()
+            .headers(headers -> {
+                headers.add(HttpHeaders.SET_COOKIE, accessCookie.toString());
+                headers.add(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+            })
+            .body(userDto);
+    }
+
+    @PostMapping(value = {"/logout", "/signout"})
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> logout(@CookieValue(value = "refresh_token", required = false) String refreshToken) {
+        if(refreshToken != null)
+        tokenService.invalidateRefreshToken(refreshToken);
+        ResponseCookie accessCookie = ResponseCookie.from("access_token", null)
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .maxAge(0)
+            .sameSite("None")
+            .build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", null)
+            .httpOnly(true)
+            .secure(true)
+            .path("/api/auth")
+            .maxAge(0)
+            .sameSite("None")
+            .build();
+        
+        return ResponseEntity
+        .noContent()
+        .headers(headers -> {
+            headers.add(HttpHeaders.SET_COOKIE, accessCookie.toString());
+            headers.add(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+        })
+        .build();
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<Void> refreshAccessToken(@CookieValue(name = "refresh_token", required = false) String refreshToken) {
+        if (refreshToken == null || !tokenService.isValid(refreshToken))
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        String newRefreshToken = tokenService.rotateRefreshToken(refreshToken);
+        String newAccessToken = tokenService.generateAccessToken(newRefreshToken);
+        ResponseCookie accessCookie = ResponseCookie.from("access_token", newAccessToken)
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .maxAge(Duration.ofMinutes(60))
+            .sameSite("None")
+            .build();
+        
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", newRefreshToken)
+            .httpOnly(true)
+            .secure(true)
+            .path("/api/auth")
+            .maxAge(Duration.ofDays(30))
+            .sameSite("None")
+            .build();
+        return ResponseEntity.ok()
+            .headers(headers -> {
+                headers.add(HttpHeaders.SET_COOKIE, accessCookie.toString());
+                headers.add(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+            })
+            .build();
+    }
+
+}

@@ -15,12 +15,11 @@ public interface BillAccountEntryRepository extends JpaRepository<BillAccountEnt
         SELECT b
         FROM BillAccountEntry b
         JOIN b.bill bill
-        JOIN bill.saleTransactions t
-        WHERE (t.date > :date
-               OR (t.date = :date AND b.id > :billAccountEntryId))
+        JOIN b.bill.saleTransaction t
+        WHERE (t.dispatchDate > :date
+               OR (t.dispatchDate = :date AND b.id > :billAccountEntryId))
           AND b.account.id = :accountId
-        GROUP BY b
-        ORDER BY t.date ASC, b.id ASC
+        ORDER BY t.dispatchDate ASC, b.id ASC
     """)
     List<BillAccountEntry> findBillsAfter(@Param("billAccountEntryId") Long lastClosingBillAccountEntryId, @Param("accountId") Long accountId, @Param("date") LocalDate date);
 
