@@ -1,5 +1,7 @@
 package com.tushar.biztrack.features.product;
 
+import com.tushar.biztrack.features.business.BaseBusinessEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,7 +14,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class Product {
+public class Product extends BaseBusinessEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -20,7 +20,7 @@ public class GoodsTransactionResponse {
 
     private LocalDate completionDate;
 
-    private PaymentMethod paymentMethod;
+    private PaymentSettlement paymentSettlement;
 
     private List<GoodsEntryResponse> entries;
 

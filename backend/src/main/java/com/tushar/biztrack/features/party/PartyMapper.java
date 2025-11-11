@@ -6,6 +6,4 @@ import org.mapstruct.Mapper;
 public interface PartyMapper {
     Party toEntity(PartyDto partyDto);
     PartyDto toDto(Party party);
-    PartySnapshot toSnapshot(Party party);
-    PartySnapshot toSnapshot(PartyDto partyDto);
 }

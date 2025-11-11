@@ -11,7 +11,7 @@ export default function Transactions() {
 
     const authFetch = useAuthFetch()
     const [dayTransactions, setDayTransactions] = useState([])
-    const [isTabIncoming, setTabIncoming] = useState(true)
+    const [isTabIncoming, setTabIncoming] = useState(false)
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]) // If the user last opened any backdate transactions then shouw popup and ask to resume there, else open today's transactions page as default
 
     const getTransactions = useCallback(async () => {

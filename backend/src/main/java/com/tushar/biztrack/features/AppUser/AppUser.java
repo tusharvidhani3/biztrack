@@ -1,12 +1,13 @@
 package com.tushar.biztrack.features.AppUser;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,7 +26,7 @@ public class AppUser {
 
     private String password;
 
-    @ManyToMany
-    private Set<Role> roles;
+    @OneToMany
+    private Set<UserBusinessRole> roles = new HashSet<>();
 
 }

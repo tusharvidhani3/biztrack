@@ -9,5 +9,6 @@ public interface AccountService {
     Page<AccountSummary> getAccounts(Pageable pageable, String partyName, PartyType partyType);
     AccountResponse getAccount(Long accountId, Pageable pageable);
     AccountEntryResponse createPaymentAccountEntry(PaymentAccountEntryRequest paymentAccountEntryRequest);
+    AccountEntryResponse createBillAccountEntry(BillAccountEntryRequest billAccountEntryRequest);
 
 }

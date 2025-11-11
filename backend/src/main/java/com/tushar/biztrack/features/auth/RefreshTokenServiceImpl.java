@@ -10,11 +10,13 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
 import com.tushar.biztrack.features.AppUser.AppUser;
 
 import jakarta.transaction.Transactional;
 
+@Service
 public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Autowired

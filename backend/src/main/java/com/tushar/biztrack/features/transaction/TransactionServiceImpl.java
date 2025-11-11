@@ -9,11 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.tushar.biztrack.common.exception.ResourceNotFoundException;
+import com.tushar.biztrack.features.account.AccountService;
+import com.tushar.biztrack.features.account.BillAccountEntryRequest;
+import com.tushar.biztrack.features.bill.BillItemRequest;
+import com.tushar.biztrack.features.bill.BillRequest;
+import com.tushar.biztrack.features.bill.BillResponse;
+import com.tushar.biztrack.features.bill.BillService;
+import com.tushar.biztrack.features.bill.BillType;
 import com.tushar.biztrack.features.party.Party;
-import com.tushar.biztrack.features.party.PartyDto;
 import com.tushar.biztrack.features.party.PartyMapper;
 import com.tushar.biztrack.features.party.PartyService;
-import com.tushar.biztrack.features.product.Product;
 import com.tushar.biztrack.features.product.ProductService;
 
 import jakarta.transaction.Transactional;
@@ -47,6 +52,12 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     private PartyMapper partyMapper;
+
+    @Autowired
+    private BillService billService;
+
+    @Autowired
+    private AccountService accountService;
     
     // @Override
     // public Long calculateQuantityLost(Long purchaseEntryId) {
@@ -98,13 +109,36 @@ public class TransactionServiceImpl implements TransactionService {
         saleTransaction.setParty(party);
         if(goodsTransactionRequest.getInitiationDate() == null)
             saleTransaction.setOrderDate(LocalDate.now());
-        List<SaleEntry> entries = goodsTransactionRequest.getEntries().stream().map(entryDto -> {
+        List<SaleEntry> saleEntries = goodsTransactionRequest.getEntries().stream().map(entryDto -> {
             SaleEntry saleEntry = transactionMapper.toSaleEntryEntity(entryDto);
             saleEntry.setSaleTransaction(saleTransaction);
             // if stocks from more than 1 purchase entries are present for the ordered goods, optionally ask the user to select purchase entry(s), else select the 1 that is present
-            saleEntry = saleEntryRepo.save(saleEntry);
             return saleEntry;
         }).collect(Collectors.toList());
+
+        saleEntryRepo.saveAll(saleEntries);
+
+        BillRequest billRequest = new BillRequest();
+        billRequest.setPartyId(goodsTransactionRequest.getPartyId());
+        billRequest.setType(BillType.SALE);
+
+        List<BillItemRequest> billItems = saleEntries.stream().map(saleEntry -> {
+            BillItemRequest billItemRequest = new BillItemRequest();
+            billItemRequest.setPrice(saleEntry.getPrice());
+            billItemRequest.setProductId(saleEntry.getPurchaseEntries().get(0).getProduct().getId());
+            billItemRequest.setQuantity(saleEntry.getQuantity());
+            return billItemRequest;
+        }).collect(Collectors.toList());
+
+        billRequest.setItems(billItems);
+        BillResponse billResponse = billService.createBill(billRequest);
+
+        if(goodsTransactionRequest.getPaymentSettlement() == PaymentSettlement.DEFFERRED) {
+            BillAccountEntryRequest billAccountEntryRequest = new BillAccountEntryRequest();
+            billAccountEntryRequest.setPartyId(party.getId());
+            billAccountEntryRequest.setBillId(billResponse.getId());
+            accountService.createBillAccountEntry(billAccountEntryRequest);
+        }
         
         GoodsTransactionResponse goodsTransactionResponse = transactionMapper.toResponse(saleTransaction);
         return goodsTransactionResponse;

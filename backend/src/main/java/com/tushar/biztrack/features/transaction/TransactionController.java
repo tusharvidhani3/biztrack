@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,8 +22,22 @@ public class TransactionController {
 
     @GetMapping
     public ResponseEntity<DailyTransactions> getTransactionsByDate(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        if(date == null)
+            date = LocalDate.now();
         DailyTransactions dailyTransactions = transactionService.getTransactionsByDate(date);
         return ResponseEntity.ok(dailyTransactions);
+    }
+
+    @PostMapping("/sales")
+    public ResponseEntity<GoodsTransactionResponse> createSaleTransaction(@RequestBody GoodsTransactionRequest goodsTransactionRequest) {
+        GoodsTransactionResponse goodsTransactionResponse = transactionService.createSaleTransaction(goodsTransactionRequest);
+        return ResponseEntity.ok(goodsTransactionResponse);
+    }
+
+    @PostMapping("/purchases")
+    public ResponseEntity<GoodsTransactionResponse> createPurchaseTransaction(@RequestBody GoodsTransactionRequest goodsTransactionRequest) {
+        GoodsTransactionResponse goodsTransactionResponse = transactionService.createPurchaseTransaction(goodsTransactionRequest);
+        return ResponseEntity.ok(goodsTransactionResponse);
     }
 
     @PutMapping("/sales/{saleTransactionId}")

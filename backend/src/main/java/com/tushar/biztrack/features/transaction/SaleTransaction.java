@@ -32,6 +32,6 @@ public class SaleTransaction {
     @ManyToOne
     private Party party;
 
-    private PaymentMethod paymentMethod;
+    private PaymentSettlement paymentSettlement;
 
 }

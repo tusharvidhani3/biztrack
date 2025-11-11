@@ -18,7 +18,7 @@ public class GoodsTransactionRequest {
 
     private LocalDate completionDate;
 
-    private PaymentMethod paymentMethod;
+    private PaymentSettlement paymentSettlement;
 
     private List<GoodsEntryRequest> entries;
 

@@ -13,4 +13,5 @@ public interface BillService {
     void deleteBill(Long billId);
     long getBillTotal(Bill bill);
     LocalDate getBillDate(Bill bill);
+    Bill getBillById(Long billId);
 }

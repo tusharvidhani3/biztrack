@@ -11,10 +11,13 @@ import org.springframework.stereotype.Component;
 
 import com.tushar.biztrack.features.AppUser.AppUser;
 
+import lombok.NoArgsConstructor;
+
 @Component
+@NoArgsConstructor
 public class UserPrincipal implements UserDetails {
     
-    private final AppUser user;
+    private  AppUser user;
 
     public UserPrincipal(AppUser user) {
         this.user = user;

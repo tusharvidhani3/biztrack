@@ -1,5 +1,7 @@
 package com.tushar.biztrack.features.party;
 
+import com.tushar.biztrack.features.business.BaseBusinessEntity;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -13,7 +15,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class Party {
+public class Party extends BaseBusinessEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +30,8 @@ public class Party {
     private PartyType type;
 
     private String city; // further make it Address
+
+    private boolean active;
 
     // private boolean isDefaulted;
 }

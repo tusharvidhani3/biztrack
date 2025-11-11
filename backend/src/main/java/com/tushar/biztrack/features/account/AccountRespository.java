@@ -11,4 +11,5 @@ import com.tushar.biztrack.features.party.PartyType;
 public interface AccountRespository extends JpaRepository<Account,Long> {
 
     Page<Account> findByParty_NameAndParty_Type(Pageable pageable, String partyName, PartyType partyType);
+    Account findByParty_Id(Long partyId);
 }

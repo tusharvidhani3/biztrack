@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.tushar.biztrack.features.bill.Bill;
 import com.tushar.biztrack.features.bill.BillService;
 import com.tushar.biztrack.features.party.PartyType;
 
@@ -163,6 +164,16 @@ public class AccountServiceImpl implements AccountService {
         }
         paymentAccountEntry = paymentAccountEntryRepo.save(paymentAccountEntry);
         return accountMapper.toResponse(paymentAccountEntry);
+    }
+
+    @Override
+    public AccountEntryResponse createBillAccountEntry(BillAccountEntryRequest billAccountEntryRequest) {
+        Bill bill = billService.getBillById(billAccountEntryRequest.getBillId());
+        Account account = accountRepo.findByParty_Id(billAccountEntryRequest.getPartyId());
+        BillAccountEntry billAccountEntry = new BillAccountEntry();
+        billAccountEntry.setAccount(account);
+        billAccountEntry.setBill(bill);
+        return accountMapper.toResponse(billAccountEntry);
     }
 
 }

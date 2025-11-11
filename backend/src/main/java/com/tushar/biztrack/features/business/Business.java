@@ -1,26 +1,31 @@
-package com.tushar.biztrack.features.account;
+package com.tushar.biztrack.features.business;
 
-import com.tushar.biztrack.features.business.BaseBusinessEntity;
-import com.tushar.biztrack.features.party.Party;
+import com.tushar.biztrack.features.AppUser.AppUser;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
-public class Account extends BaseBusinessEntity {
+public class Business {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    private Party party;
+    private String name;
 
+    private String gstNumber;
+
+    private String phoneNumber;
+
+    @ManyToOne
+    private AppUser owner;
+    
 }

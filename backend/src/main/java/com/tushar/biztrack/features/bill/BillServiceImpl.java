@@ -9,11 +9,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.tushar.biztrack.features.party.PartyMapper;
+import com.tushar.biztrack.features.party.Party;
+import com.tushar.biztrack.features.party.PartyService;
 import com.tushar.biztrack.features.product.Product;
 import com.tushar.biztrack.features.product.ProductMapper;
 import com.tushar.biztrack.features.product.ProductService;
-import com.tushar.biztrack.features.transaction.TransactionService;
 
 import jakarta.transaction.Transactional;
 
@@ -39,10 +39,7 @@ public class BillServiceImpl implements BillService {
     private ProductService productService;
 
     @Autowired
-    private PartyMapper partyMapper;
-
-    @Autowired
-    private TransactionService transactionService;
+    private PartyService partyService;
 
     @Override
     public BillResponse getBill(Long billId) {
@@ -62,7 +59,10 @@ public class BillServiceImpl implements BillService {
     @Override
     @Transactional
     public BillResponse createBill(BillRequest billRequest) {
-        Bill bill = billRepo.save(billMapper.toEntity(billRequest));
+        Bill bill = billMapper.toEntity(billRequest);
+        Party party = partyService.getPartyById(billRequest.getPartyId());
+        bill.setParty(party);
+        billRepo.save(bill);
         List<BillItem> billItems = billRequest.getItems().stream().map(billItemRequest -> {
             BillItem billItem = billItemMapper.toEntity(billItemRequest);
             Product product = productService.getProductById(billItemRequest.getProductId());
@@ -71,6 +71,7 @@ public class BillServiceImpl implements BillService {
             return billItem;
         }).collect(Collectors.toList());
         billItems = billItemRepo.saveAll(billItems);
+
         BillResponse billResponse = billMapper.toResponse(bill);
         List<BillItemResponse> billItemResponses = billItems.stream().map(billItem -> billItemMapper.toResponse(billItem)).collect(Collectors.toList());
         billResponse.setItems(billItemResponses);
@@ -81,8 +82,10 @@ public class BillServiceImpl implements BillService {
     public BillResponse updateBill(BillRequest billRequest) {
         Bill bill = billRepo.findById(billRequest.getId()).get();
 
-        if(billRequest.getParty() != null)
-        bill.setParty(partyMapper.toSnapshot(billRequest.getParty()));
+        if(billRequest.getPartyId() != null) {
+            Party party = partyService.getPartyById(billRequest.getPartyId());
+            bill.setParty(party);
+        }
         if(billRequest.getItems() != null) {
             List<BillItemRequest> billItemRequests = billRequest.getItems();
             for(BillItemRequest b : billItemRequests) {
@@ -125,7 +128,7 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public long getBillTotal(Bill bill) {
-        long total = transactionService.getSaleTransactionAmount(bill.getSaleTransaction().getId());
+        long total = 0;
         total += bill.getAdditionalCharges();
         return total;
     }
@@ -133,6 +136,11 @@ public class BillServiceImpl implements BillService {
     @Override
     public LocalDate getBillDate(Bill bill) {
         return bill.getSaleTransaction().getDispatchDate();
+    }
+
+    @Override
+    public Bill getBillById(Long billId) {
+        return billRepo.findById(billId).get();
     }
     
 }

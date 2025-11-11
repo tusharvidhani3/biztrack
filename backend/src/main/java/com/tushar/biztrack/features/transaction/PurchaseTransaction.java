@@ -30,7 +30,7 @@ public class PurchaseTransaction {
 
     private LocalDate receivedDate;
 
-    private PaymentMethod paymentMethod;
+    private PaymentSettlement paymentSettlement;
 
     private String note;
 }

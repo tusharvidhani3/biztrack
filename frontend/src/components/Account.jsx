@@ -13,6 +13,37 @@ export default function Account() {
 
     const { authFetch } = useAuthFetch()
 
+    const paymentEntryReducer = useCallback((state, action) => {
+        const { type, payload } = action
+        switch (type) {
+            case 'AMOUNT':
+                return { ...state, amount: payload }
+            case 'DATE':
+                return { ...state, date: payload }
+            
+            }
+    }, [])
+
+    const dateInputRef = useRef(null)
+
+    const dateToday = useMemo(() => new Date(), [])
+
+    const [paymentEntry, dispatch] = useReducer(paymentEntryReducer, {
+        amount: '',
+        date: `${dateToday.toISOString().split("T")[0]}`
+    })
+
+    const dateLabel = useMemo(() => {
+        const selectedDate = new Date(paymentEntry.date)
+        if (selectedDate.getDate() === dateToday.getDate() && selectedDate.getMonth() === dateToday.getMonth() && selectedDate.getFullYear() === dateToday.getFullYear())
+            return 'Today'
+        dateToday.setDate(dateToday.getDate() - 1)
+        if (selectedDate.getDate() === dateToday.getDate() && selectedDate.getMonth() === dateToday.getMonth() && selectedDate.getFullYear() === dateToday.getFullYear())
+            return 'Yesterday'
+        else
+            return paymentEntry.date
+    }, [dateToday, paymentEntry])
+
     async function getAccount() {
         const res = await authFetch(`${apiBaseUrl}/api/accounts/${accountId}`, {
             method: 'GET'
@@ -45,7 +76,7 @@ export default function Account() {
             <section className="flex flex-col">
                 {account.entries.map(entry => {
                     const entryDate = new Date(entry.date)
-                    if(entry.type === 'BILL') {
+                    if (entry.type === 'BILL') {
                         return <div className="flex"><div>{entryDate.getDate()} {entryDate.toLocaleString('default', { month: 'long' })} {entryDate.getFullYear()}</div> <div>₹{entry.amount}</div></div>
                     }
                     else {
